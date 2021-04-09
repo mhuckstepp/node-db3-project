@@ -1,5 +1,7 @@
 # Node DB3 Project Starter Code
 
+<!-- Changed for git initial commit -->
+
 ## Instructions
 
 ### Task 1: Project Setup
