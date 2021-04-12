@@ -103,8 +103,60 @@ You do not need to make any changes to this file.
 In [SQL Try Editor at W3Schools.com](https://www.w3schools.com/Sql/tryit.asp?filename=trysql_select_top):
 
 - Find the number of shipments by each shipper.
+
+        SELECT o.shipperid, shippers.ShipperName, count(o.shipperid) Shipments
+        FROM orders o
+        join shippers on o.shipperid=shippers.shipperid
+        group by o.shipperid
+
 - Find the top 5 best performing employees measured in number of orders.
+
+        SELECT o.orderid, o.employeeid, (e.firstname || ' ' || e.lastname) name,
+        count(o.orderid ) orders FROM orders o
+        join employees e on o.employeeid=e.employeeid
+        join orderdetails od on o.orderid=od.orderid
+        join products p on od.productid=p.productid
+        group by o.employeeid
+        order by orders desc
+        limit 5;
+
 - Find the top 5 best performing employees measured in revenue.
+
+        SELECT o.orderid, o.employeeid, (e.firstname || ' ' || e.lastname) name, p.price, od.quantity,
+        sum(p.price*od.quantity ) total_rev FROM orders o
+        join employees e on o.employeeid=e.employeeid
+        join orderdetails od on o.orderid=od.orderid
+        join products p on od.productid=p.productid
+        group by o.employeeid
+        order by total_rev desc
+        limit 5;
+
 - Find the category that brings in the least revenue.
+
+        SELECT o.orderid, p.productid, p.categoryid, od.quantity, p.price, c.categoryname, sum(od.quantity*p.price) total FROM orders o
+        join orderdetails od on o.orderid=od.orderid
+        join products p on od.productid=p.productid
+        join categories c on p.categoryid=c.categoryid
+        group by c.categoryid
+        order by total asc
+        limit 1;
+
 - Find the customer country with the most orders.
+
+        SELECT o.*, c.country, count(o.orderid) total_orders FROM orders o
+        join orderdetails od on o.orderid=od.orderid
+        join products p on od.productid=p.productid
+        join customers c on o.customerid=c.customerid
+        group by c.country
+        order by total_orders desc
+        limit 1;
+
 - Find the shipper that moves the most cheese measured in units.
+
+        SELECT o.orderid, o.shipperid, od.quantity, c.categoryid, c.description, count(od.quantity) total FROM orders o
+        join orderdetails od on o.orderid=od.orderid
+        join products p on od.productid=p.productid
+        join categories c on p.categoryid = c.categoryid
+        where c.categoryid=4
+        group by shipperid
+        order by total desc
