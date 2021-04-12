@@ -16,7 +16,7 @@ const checkSchemeId = (req, res, next) => {
         next();
       } else {
         res.status(404).json({
-          message: `scheme with scheme_id ${req.params.id} not found`,
+          message: `scheme with scheme_id ${req.params.scheme_id} not found`,
         });
       }
     })
@@ -55,7 +55,7 @@ const validateScheme = (req, res, next) => {
 const validateStep = (req, res, next) => {
   if (!req.body.instructions || typeof req.body.instructions !== "string") {
     res.status(400).json({
-      message: "invalid step",
+      message: "invalid instructions",
     });
   } else if (
     !req.body.step_number ||

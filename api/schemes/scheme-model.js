@@ -1,4 +1,3 @@
-const { where } = require("../../data/db-config");
 const db = require("../../data/db-config");
 
 function find() {
@@ -22,12 +21,12 @@ function find() {
   return db("schemes")
     .select("schemes.*")
     .leftJoin("steps", "schemes.scheme_id", "steps.scheme_id")
-    .count({ "number of steps": "steps.step_id" })
+    .count({ number_of_steps: "steps.step_id" })
     .groupBy("schemes.scheme_id")
     .orderBy("schemes.scheme_id");
 }
 
-function findById(id) {
+async function findById(scheme_id) {
   // EXERCISE B
   /*
     1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
@@ -97,10 +96,31 @@ function findById(id) {
         "steps": []
       }
   */
-  console.log(id);
-  return db("schemes")
+  let scheme = await db("schemes")
     .leftJoin("steps", "schemes.scheme_id", "steps.scheme_id")
-    .where("schemes.scheme_id", id);
+    .select("scheme_name", "steps.scheme_id", "steps.*")
+    .where("schemes.scheme_id", Number(scheme_id))
+    .orderBy("steps.step_number");
+  if (scheme.length) {
+    let steps = scheme
+      .filter((scheme) => {
+        return scheme.step_id;
+      })
+      .map((scheme) => {
+        return {
+          step_id: scheme.step_id,
+          step_number: scheme.step_number,
+          instructions: scheme.instructions,
+        };
+      });
+    return {
+      scheme_id: Number(scheme_id),
+      scheme_name: scheme[0].scheme_name,
+      steps,
+    };
+  } else {
+    return null;
+  }
 }
 
 function findSteps(scheme_id) {
@@ -128,7 +148,8 @@ function findSteps(scheme_id) {
   return db("steps")
     .select("step_id", "step_number", "instructions", "scheme_name")
     .leftJoin("schemes", "schemes.scheme_id", "steps.scheme_id")
-    .where("steps.scheme_id", scheme_id);
+    .where("steps.scheme_id", scheme_id)
+    .orderBy("steps.step_number");
 }
 
 async function add(scheme) {

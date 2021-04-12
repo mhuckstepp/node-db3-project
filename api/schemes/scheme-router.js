@@ -60,19 +60,11 @@ router.get("/:scheme_id", checkSchemeId, (req, res, next) => {
   const { scheme_id } = req.params;
   Schemes.findById(scheme_id)
     .then((scheme) => {
-      res.json({
-        scheme_id: scheme[0].scheme_id,
-        scheme_name: scheme[0].scheme_name,
-        steps: scheme.map((step) => {
-          return {
-            step_id: step.step_id,
-            step_number: step.step_number,
-            instructions: step.instructions,
-          };
-        }),
-      });
+      res.json(scheme);
     })
-    .catch(next);
+    .catch((err) => {
+      next(err);
+    });
 });
 
 /*
