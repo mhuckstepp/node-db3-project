@@ -9,16 +9,20 @@ const { findById } = require("./scheme-model");
   }
 */
 const checkSchemeId = (req, res, next) => {
-  findById(req.params.id).then((user) => {
-    if (user) {
-      req.newBody = user;
-      next();
-    } else {
-      res.status(404).json({
-        message: `scheme with scheme_id ${req.params.id} not found`,
-      });
-    }
-  });
+  findById(req.params.scheme_id)
+    .then((user) => {
+      if (user) {
+        req.newBody = user;
+        next();
+      } else {
+        res.status(404).json({
+          message: `scheme with scheme_id ${req.params.id} not found`,
+        });
+      }
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 /*
