@@ -18,12 +18,12 @@ function find() {
     2A- When you have a grasp on the query go ahead and build it in Knex.
     Return from this function the resulting dataset.
   */
-  return db("schemes")
-    .select("schemes.*")
-    .leftJoin("steps", "schemes.scheme_id", "steps.scheme_id")
+  return db("schemes as s")
+    .select("s.*")
+    .leftJoin("steps", "s.scheme_id", "steps.scheme_id")
     .count({ number_of_steps: "steps.step_id" })
-    .groupBy("schemes.scheme_id")
-    .orderBy("schemes.scheme_id");
+    .groupBy("s.scheme_id")
+    .orderBy("s.scheme_id");
 }
 
 async function findById(scheme_id) {
@@ -96,11 +96,11 @@ async function findById(scheme_id) {
         "steps": []
       }
   */
-  let scheme = await db("schemes")
-    .leftJoin("steps", "schemes.scheme_id", "steps.scheme_id")
-    .select("scheme_name", "steps.scheme_id", "steps.*")
-    .where("schemes.scheme_id", Number(scheme_id))
-    .orderBy("steps.step_number");
+  let scheme = await db("schemes as s")
+    .leftJoin("steps as st", "s.scheme_id", "st.scheme_id")
+    .select("scheme_name", "st.scheme_id", "st.*")
+    .where("s.scheme_id", Number(scheme_id))
+    .orderBy("st.step_number");
   if (scheme.length) {
     let steps = scheme
       .filter((scheme) => {
@@ -145,11 +145,11 @@ function findSteps(scheme_id) {
         }
       ]
   */
-  return db("steps")
+  return db("steps as st")
     .select("step_id", "step_number", "instructions", "scheme_name")
-    .leftJoin("schemes", "schemes.scheme_id", "steps.scheme_id")
-    .where("steps.scheme_id", scheme_id)
-    .orderBy("steps.step_number");
+    .leftJoin("schemes as s", "s.scheme_id", "st.scheme_id")
+    .where("st.scheme_id", scheme_id)
+    .orderBy("st.step_number");
 }
 
 async function add(scheme) {
@@ -168,7 +168,7 @@ async function addStep(scheme_id, step) {
     and resolves to _all the steps_ belonging to the given `scheme_id`,
     including the newly created one.
   */
-  let res = await db("steps").insert({
+  await db("steps").insert({
     scheme_id,
     instructions: step.instructions,
     step_number: step.step_number,
